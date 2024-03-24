@@ -7,6 +7,8 @@ from typing import Any
 
 from homeassistant.core import HomeAssistant
 
+from .const import CONF_DEFAULT_TEXT_TEMPLATE
+
 
 # ------------------------------------------------------------------
 # ------------------------------------------------------------------
@@ -42,7 +44,7 @@ class Translate:
                 if "language" in owner_data and "language" in owner_data["language"]:
                     language = owner_data["language"]["language"]
 
-        self.__check_language_loaded(str(language), "default.")
+        self.__check_language_loaded(str(language), CONF_DEFAULT_TEXT_TEMPLATE)
 
         if len(kvargs) == 0:
             return Translate.__json_dict.get(key, default)

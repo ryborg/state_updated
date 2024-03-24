@@ -36,7 +36,8 @@
           "attribute": "Entitets attribut for entitet som spores",
           "icon": "Ikon",
           "clear_update_after_hours": "Nulstil opdatering efter",
-          "text_template": "Definerer en skabelon til at danne tekst attributen. Værdier = new_value, old_value, entity_id, attribute og last_updated"
+          "text_template": "Definerer en skabelon til at danne tekst attributen. Værdier = new_value, old_value, entity_id, attribute og last_updated",
+          "default_text_template": "Entitet {{ entity_id }} tilstand er ændret fra {{ old_value }} til {{ new_value }}."
         }
       }
     }
@@ -56,7 +57,8 @@
           "attribute": "Entitets attribut for entitet som spores",
           "icon": "Ikon",
           "clear_update_after_hours": "Nulstil opdatering efter",
-          "text_template": "Definerer en skabelon til at danne tekst attributen. Værdier = new_value, old_value, entity_id, attribute og last_updated"
+          "text_template": "Definerer en skabelon til at danne tekst attributen. Værdier = new_value, old_value, entity_id, attribute og last_updated",
+          "default_text_template": "Entitet {{ entity_id }} tilstand er ændret fra {{ old_value }} til {{ new_value }}."
         }
       }
     }
@@ -71,9 +73,5 @@
       "description": "Reset alle tilstand opdateret entiteter.",
       "name": "Reset alt"
     }
-  },
-
-  "default": {
-    "text_template": "Entitet {{ entity_id }} tilstand er ændret fra {{ old_value }} til {{ new_value }}."
   }
 }
