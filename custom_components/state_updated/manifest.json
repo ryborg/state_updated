@@ -5,11 +5,10 @@
   "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/kgn3400/state_updated",
-  "issue_tracker": "https://github.com/kgn3400/state_updated/issues",
-
   "homekit": {},
   "integration_type": "helper",
   "iot_class": "calculated",
+  "issue_tracker": "https://github.com/kgn3400/state_updated/issues",
   "requirements": [],
   "ssdp": [],
   "version": "1.0.0",
