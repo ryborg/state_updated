@@ -91,9 +91,8 @@ class StateUpdatedBinarySensor(BinarySensorEntity):
 
     # ------------------------------------------------------
     async def async_will_remove_from_hass(self) -> None:
-        """Complete device setup after being added to hass."""
+        """When removed from hass."""
         StateUpdatedBinarySensor.entity_list.remove(self.component_api)
-        pass
 
     # ------------------------------------------------------
     async def async_added_to_hass(self) -> None:

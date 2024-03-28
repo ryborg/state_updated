@@ -55,12 +55,8 @@ class ComponentApi:
 
         self.updated = False
         self.text = ""
-        tmp_options: dict[str, Any] = self.entry.options.copy()
-        tmp_options[CONF_UPDATED] = self.updated
 
-        self.hass.config_entries.async_update_entry(
-            self.entry, data=tmp_options, options=tmp_options
-        )
+        self.update_config()
         await self.coordinator.async_refresh()
 
     # ------------------------------------------------------------------
@@ -82,15 +78,22 @@ class ComponentApi:
             self.updated = True
             self.last_updated = datetime.now(UTC)
             self.create_text_from_template()
-            tmp_options: dict[str, Any] = self.entry.options.copy()
-            tmp_options[CONF_NEW_VALUE] = self.new_value
-            tmp_options[CONF_OLD_VALUE] = self.old_value
-            tmp_options[CONF_UPDATED] = self.updated
-            tmp_options[CONF_LAST_UPDATED] = self.last_updated.isoformat()
 
-            self.hass.config_entries.async_update_entry(
-                self.entry, data=tmp_options, options=tmp_options
-            )
+            self.update_config()
+
+    # ------------------------------------------------------------------
+    def update_config(self) -> None:
+        """Update config."""
+
+        tmp_options: dict[str, Any] = self.entry.options.copy()
+        tmp_options[CONF_NEW_VALUE] = self.new_value
+        tmp_options[CONF_OLD_VALUE] = self.old_value
+        tmp_options[CONF_UPDATED] = self.updated
+        tmp_options[CONF_LAST_UPDATED] = self.last_updated.isoformat()
+
+        self.hass.config_entries.async_update_entry(
+            self.entry, data=tmp_options, options=tmp_options
+        )
 
     # ------------------------------------------------------------------
     async def async_update(self) -> None:
@@ -102,17 +105,13 @@ class ComponentApi:
         ) < datetime.now(UTC):
             self.updated = False
             self.text = ""
-            tmp_options: dict[str, Any] = self.entry.options.copy()
-            tmp_options[CONF_UPDATED] = self.updated
 
-            self.hass.config_entries.async_update_entry(
-                self.entry, data=tmp_options, options=tmp_options
-            )
+            self.update_config()
             await self.coordinator.async_refresh()
 
     # ------------------------------------------------------------------
     async def async_config_entry_refresh(self) -> None:
-        """Update."""
+        """Config entry hass been updated."""
         await self.async_update()
 
     # ------------------------------------------------------------------
