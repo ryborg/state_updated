@@ -40,13 +40,13 @@ class ComponentApi:
         self.entry: ConfigEntry = entry
         self.coordinator: DataUpdateCoordinator
 
-        self.updated: bool = entry.options[CONF_UPDATED]
+        self.updated: bool = entry.options.get(CONF_UPDATED, False)
         self.last_updated: datetime = datetime.fromisoformat(
-            entry.options[CONF_LAST_UPDATED]
+            entry.options.get(CONF_LAST_UPDATED, datetime.now(UTC).isoformat)
         )
 
-        self.new_value: Any = entry.options[CONF_NEW_VALUE]
-        self.old_value: Any = entry.options[CONF_OLD_VALUE]
+        self.new_value: Any = entry.options.get(CONF_NEW_VALUE, "")
+        self.old_value: Any = entry.options.get(CONF_OLD_VALUE, "")
         self.create_text_from_template()
 
     # ------------------------------------------------------------------

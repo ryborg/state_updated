@@ -130,6 +130,8 @@ class StateUpdatedBinarySensor(BinarySensorEntity):
             except (ValueError, TypeError) as ex:
                 LOGGER.error(ex)
 
+        await super().async_added_to_hass()
+
         await self.coordinator.async_config_entry_first_refresh()
 
         StateUpdatedBinarySensor.entity_list.append(self.component_api)
