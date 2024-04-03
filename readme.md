@@ -15,6 +15,8 @@ For installation instructions until the State updated helper is part of HACS, [s
 
 Configuration is setup via UI in Home assistant. To add one, go to [Settings > Devices & Services > Helpers](https://my.home-assistant.io/redirect/helpers) and click the add button. Next choose the [State updated helper](https://my.home-assistant.io/redirect/config_flow_start?domain=state_updated) option.
 
+![Config](images/config.png)
+
 | Field name | Mandatory/Optional | Description |
 |------------|------------------|-------------|
 | Name | Optional | Name. If empty, entity id name are used  |
