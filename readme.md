@@ -17,6 +17,8 @@ Configuration is setup via UI in Home assistant. To add one, go to [Settings > D
 
 ![Config](images/config.png)
 
+![Config](images/options.png)
+
 | Field name | Mandatory/Optional | Description |
 |------------|------------------|-------------|
 | Name | Optional | Name. If empty, entity id name are used  |
