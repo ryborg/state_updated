@@ -32,6 +32,7 @@
         }
       },
       "user_ekstra": {
+        "title": "Tilstand opdateret hjælper",
         "data": {
           "attribute": "Entitets attribut for entitet som spores",
           "icon": "Ikon",

@@ -33,6 +33,7 @@
         }
       },
       "user_ekstra": {
+        "title": "State updated helper",
         "data": {
           "attribute": "Attribute of entity that this sensor tracks",
           "icon": "Icon",
