@@ -1,4 +1,5 @@
 """Support for State updated."""
+
 from __future__ import annotations
 
 from datetime import timedelta
@@ -191,6 +192,33 @@ class StateUpdatedBinarySensor(BinarySensorEntity):
             str: Icon name
 
         """
+
+        # entity_registry = er.async_get(self.hass)
+        # device_registry = dr.async_get(self.hass)
+        # source_entity = entity_registry.async_get(
+        #     self.entry.options.get(CONF_ENTITY_ID, "")
+        # )
+
+        # if (
+        #     (source_entity is not None)
+        #     and (source_entity.device_id is not None)
+        #     and (
+        #         (
+        #             device := device_registry.async_get(
+        #                 device_id=source_entity.device_id,
+        #             )
+        #         )
+        #         is not None
+        #     )
+        # ):
+        #     tmp_config = self.hass.config_entries.async_get_entry(
+        #         source_entity.config_entry_id
+        #     )
+
+        # state = self.hass.states.get(self.entry.options.get(CONF_ENTITY_ID, ""))
+
+        # if state is not None:
+        #     icon = state.attributes.get(ATTR_ICON)
 
         return self.entry.options.get(CONF_ICON, "mdi:state-machine")
 

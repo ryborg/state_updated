@@ -7,8 +7,6 @@ from typing import Any
 
 from homeassistant.core import HomeAssistant
 
-from .const import CONF_DEFAULT_TEXT_TEMPLATE
-
 
 # ------------------------------------------------------------------
 # ------------------------------------------------------------------
@@ -24,7 +22,12 @@ class Translate:
 
     # ------------------------------------------------------------------
     async def async_get_localized_str(
-        self, key: str, language: str | None = None, default: Any = "", **kvargs
+        self,
+        key: str,
+        language: str | None = None,
+        load_only: str = "",
+        default: Any = "",
+        **kvargs,
     ) -> str:
         """Get localized string."""
 
@@ -44,27 +47,31 @@ class Translate:
                 if "language" in owner_data and "language" in owner_data["language"]:
                     language = owner_data["language"]["language"]
 
-        self.__check_language_loaded(str(language), CONF_DEFAULT_TEXT_TEMPLATE)
+        self.__check_language_loaded(str(language), load_only)
 
         if len(kvargs) == 0:
             return Translate.__json_dict.get(key, default)
-        else:
-            return str(Translate.__json_dict.get(key, default)).format(**kvargs)
+
+        return str(Translate.__json_dict.get(key, default)).format(**kvargs)
 
     # ------------------------------------------------------------------
-    def __check_language_loaded(self, language: str, only: str = "") -> None:
+    def __check_language_loaded(self, language: str, load_only: str = "") -> None:
         """Check language."""
 
         # ------------------------------------------------------------------
         def recursive_flatten(
-            prefix: Any, data: dict[str, Any], only: str = ""
+            prefix: Any, data: dict[str, Any], load_only: str = ""
         ) -> dict[str, Any]:
             """Return a flattened representation of dict data."""
             output = {}
             for key, value in data.items():
                 if isinstance(value, dict):
-                    output.update(recursive_flatten(f"{prefix}{key}.", value, only))
-                elif (only != "" and f"{prefix}{key}".find(only) == 0) or only == "":
+                    output.update(
+                        recursive_flatten(f"{prefix}{key}.", value, load_only)
+                    )
+                elif (
+                    load_only != "" and f"{prefix}{key}".find(load_only) == 0
+                ) or load_only == "":
                     output[f"{prefix}{key}"] = value
             return output
 
@@ -79,7 +86,7 @@ class Translate:
                 with open(filename) as json_file:
                     parsed_json = json.load(json_file)
 
-                Translate.__json_dict = recursive_flatten("", parsed_json, only)
+                Translate.__json_dict = recursive_flatten("", parsed_json, load_only)
                 return
 
             # filename = os.path.join(
@@ -103,6 +110,6 @@ class Translate:
                 with open(filename) as json_file:
                     parsed_json = json.load(json_file)
 
-                Translate.__json_dict = recursive_flatten("", parsed_json, only)
+                Translate.__json_dict = recursive_flatten("", parsed_json, load_only)
 
                 return

@@ -1,4 +1,5 @@
 """Config flow for State updated integration."""
+
 from __future__ import annotations
 
 from datetime import UTC, datetime
@@ -92,7 +93,8 @@ async def _create_form(
                         default=user_input.get(
                             CONF_TEXT_TEMPLATE,
                             await Translate(hass).async_get_localized_str(
-                                CONF_DEFAULT_TEXT_TEMPLATE
+                                CONF_DEFAULT_TEXT_TEMPLATE,
+                                load_only=CONF_DEFAULT_TEXT_TEMPLATE,
                             ),
                         ),
                     ): TemplateSelector(),

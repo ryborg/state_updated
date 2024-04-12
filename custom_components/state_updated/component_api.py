@@ -12,6 +12,7 @@ from homeassistant.const import (
     STATE_UNKNOWN,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import get_unit_of_measurement
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
@@ -44,6 +45,8 @@ class ComponentApi:
         self.last_updated: datetime = datetime.fromisoformat(
             entry.options.get(CONF_LAST_UPDATED, datetime.now(UTC).isoformat)
         )
+
+        self.uom: str = self.get_uom()
 
         self.new_value: Any = entry.options.get(CONF_NEW_VALUE, "")
         self.old_value: Any = entry.options.get(CONF_OLD_VALUE, "")
@@ -81,6 +84,8 @@ class ComponentApi:
 
             self.update_config()
 
+        self.uom = self.get_uom()
+
     # ------------------------------------------------------------------
     def update_config(self) -> None:
         """Update config."""
@@ -115,6 +120,24 @@ class ComponentApi:
         await self.async_update()
 
     # ------------------------------------------------------------------
+    def get_uom(self) -> str:
+        """Get uom."""
+
+        if self.entry.options.get(CONF_ENTITY_ID, "") != "":
+            tmp_uom: str = get_unit_of_measurement(
+                self.hass,
+                self.entry.options.get(CONF_ENTITY_ID),
+            )
+
+        if tmp_uom is not None:
+            if tmp_uom == "%":
+                return tmp_uom
+
+            return " " + tmp_uom
+
+        return ""
+
+    # ------------------------------------------------------------------
     def create_text_from_template(self) -> None:
         """Create text from template."""
 
@@ -122,8 +145,8 @@ class ComponentApi:
             values: dict[str, Any] = {
                 CONF_ENTITY_ID: self.entry.options.get(CONF_ENTITY_ID, ""),
                 CONF_ATTRIBUTE: self.entry.options.get(CONF_ATTRIBUTE, ""),
-                CONF_NEW_VALUE: self.new_value,
-                CONF_OLD_VALUE: self.old_value,
+                CONF_NEW_VALUE: self.new_value + self.uom,
+                CONF_OLD_VALUE: self.old_value + self.uom,
                 CONF_LAST_UPDATED: self.last_updated.isoformat(),
             }
 
