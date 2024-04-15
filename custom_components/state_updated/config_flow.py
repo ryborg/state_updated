@@ -72,9 +72,9 @@ async def _create_form(
                             entity_id=user_input[CONF_ENTITY_ID]
                         )
                     ),
-                    vol.Required(
+                    vol.Optional(
                         CONF_ICON,
-                        default=user_input.get(CONF_ICON, "mdi:state-machine"),
+                        default=user_input.get(CONF_ICON, ""),
                     ): IconSelector(),
                     vol.Required(
                         CONF_CLEAR_UPDATES_AFTER_HOURS,

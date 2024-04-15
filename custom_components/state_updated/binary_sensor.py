@@ -15,6 +15,9 @@ from homeassistant.const import (
 )
 from homeassistant.core import Event, HomeAssistant, ServiceCall, callback
 from homeassistant.helpers import entity_platform
+
+# entity_registry as er,
+# icon,
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import (
     EventStateChangedData,
@@ -23,7 +26,14 @@ from homeassistant.helpers.event import (
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .component_api import ComponentApi
-from .const import CONF_LAST_UPDATED, CONF_NEW_VALUE, CONF_OLD_VALUE, DOMAIN, LOGGER
+from .const import (
+    CONF_LAST_UPDATED,
+    CONF_NEW_VALUE,
+    CONF_OLD_VALUE,
+    DOMAIN,
+    LOGGER,
+    TRANSLATION_KEY,
+)
 
 
 # ------------------------------------------------------
@@ -55,7 +65,7 @@ class StateUpdatedBinarySensor(BinarySensorEntity):
         self.entry: ConfigEntry = entry
         self.hass = hass
 
-        # nyt start
+        self.translation_key = TRANSLATION_KEY
         self.component_api: ComponentApi = ComponentApi(self.hass, self.entry)
 
         self.coordinator: DataUpdateCoordinator = DataUpdateCoordinator(
@@ -64,8 +74,8 @@ class StateUpdatedBinarySensor(BinarySensorEntity):
             name=DOMAIN,
             update_interval=timedelta(minutes=1),
             update_method=self.component_api.async_update,
-        )  # type: ignore
-        self.component_api.coordinator = self.coordinator  # type: ignore
+        )
+        self.component_api.coordinator = self.coordinator
 
         platform = entity_platform.async_get_current_platform()
         platform.async_register_entity_service(
@@ -134,6 +144,10 @@ class StateUpdatedBinarySensor(BinarySensorEntity):
         await super().async_added_to_hass()
 
         await self.coordinator.async_config_entry_first_refresh()
+
+        # icons = await icon.async_get_icons(
+        #     self.hass, "entity", integrations=["temperature"]
+        # )
 
         StateUpdatedBinarySensor.entity_list.append(self.component_api)
 
@@ -220,7 +234,10 @@ class StateUpdatedBinarySensor(BinarySensorEntity):
         # if state is not None:
         #     icon = state.attributes.get(ATTR_ICON)
 
-        return self.entry.options.get(CONF_ICON, "mdi:state-machine")
+        if self.entry.options.get(CONF_ICON, "").strip() != "":
+            return self.entry.options.get(CONF_ICON, "mdi:state-machine")
+
+        return None
 
     # ------------------------------------------------------
     @property
