@@ -2,22 +2,30 @@
 
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from homeassistant.components.binary_sensor import BinarySensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
+    ATTR_ICON,
     CONF_ATTRIBUTE,
     CONF_ENTITY_ID,
     CONF_ICON,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import Event, HomeAssistant, ServiceCall, callback
-from homeassistant.helpers import entity_platform
+from homeassistant.core import Event, HomeAssistant, ServiceCall, State, callback
+from homeassistant.helpers import (
+    entity_platform,
+    entity_registry as er,
+    icon as ic,
+    issue_registry as ir,
+    start,
+)
 
 # entity_registry as er,
 # icon,
+from homeassistant.helpers.entity import get_device_class
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import (
     EventStateChangedData,
@@ -31,8 +39,10 @@ from .const import (
     CONF_NEW_VALUE,
     CONF_OLD_VALUE,
     DOMAIN,
+    DOMAIN_NAME,
     LOGGER,
     TRANSLATION_KEY,
+    TRANSLATION_KEY_MISSING_ENTITY,
 )
 
 
@@ -81,17 +91,21 @@ class StateUpdatedBinarySensor(BinarySensorEntity):
         platform.async_register_entity_service(
             "reset_entity",
             {},
-            "async_reset_entity",
+            self.async_reset_entity,
         )
 
         self.hass.services.async_register(
             DOMAIN, "reset_all", self.async_reset_all_service
         )
 
+        self.entity_icon: str = None
+
     # ------------------------------------------------------
-    async def async_reset_entity(self) -> None:
-        """SReset entity."""
-        await self.component_api.async_reset()
+    async def async_reset_entity(
+        self, entity: StateUpdatedBinarySensor, call: ServiceCall
+    ) -> None:
+        """Reset entity."""
+        await entity.component_api.async_reset()
 
     # ------------------------------------------------------------------
     async def async_reset_all_service(self, call: ServiceCall) -> None:
@@ -145,10 +159,6 @@ class StateUpdatedBinarySensor(BinarySensorEntity):
 
         await self.coordinator.async_config_entry_first_refresh()
 
-        # icons = await icon.async_get_icons(
-        #     self.hass, "entity", integrations=["temperature"]
-        # )
-
         StateUpdatedBinarySensor.entity_list.append(self.component_api)
 
         self.entry.async_on_unload(self.entry.add_update_listener(self.update_listener))
@@ -162,6 +172,62 @@ class StateUpdatedBinarySensor(BinarySensorEntity):
         )
         self.async_on_remove(
             self.coordinator.async_add_listener(self.async_write_ha_state)
+        )
+
+        self.async_on_remove(start.async_at_started(self.hass, self.hass_started))
+
+    # ------------------------------------------------------
+    async def async_verify_entity_exist(
+        self,
+    ) -> bool:
+        """Verify entity exist."""
+
+        state: State | None = self.hass.states.get(
+            self.entry.options.get(CONF_ENTITY_ID)
+        )
+
+        if state is None:
+            await self.async_create_issue_entity(
+                self.entry.options.get(CONF_ENTITY_ID),
+                TRANSLATION_KEY_MISSING_ENTITY,
+            )
+            self.coordinator.update_interval = None
+            return False
+
+        return True
+
+    # ------------------------------------------------------
+    async def hass_started(self, _event: Event) -> None:
+        """Hass started."""
+
+        if await self.async_verify_entity_exist():
+            self.device_class = get_device_class(
+                self.hass, self.entry.options.get(CONF_ENTITY_ID)
+            )
+
+            if self.device_class is None:
+                self.entity_icon = await self.async_get_icon(
+                    self.entry.options.get(CONF_ENTITY_ID)
+                )
+
+    # ------------------------------------------------------------------
+    async def async_create_issue_entity(
+        self, entity_id: str, translation_key: str
+    ) -> None:
+        """Create issue on entity."""
+
+        ir.async_create_issue(
+            self.hass,
+            DOMAIN,
+            DOMAIN_NAME + datetime.now().isoformat(),
+            issue_domain=DOMAIN,
+            is_fixable=False,
+            severity=ir.IssueSeverity.WARNING,
+            translation_key=translation_key,
+            translation_placeholders={
+                "entity": entity_id,
+                "state_updated_helper": self.entity_id,
+            },
         )
 
     # ------------------------------------------------------
@@ -207,37 +273,10 @@ class StateUpdatedBinarySensor(BinarySensorEntity):
 
         """
 
-        # entity_registry = er.async_get(self.hass)
-        # device_registry = dr.async_get(self.hass)
-        # source_entity = entity_registry.async_get(
-        #     self.entry.options.get(CONF_ENTITY_ID, "")
-        # )
-
-        # if (
-        #     (source_entity is not None)
-        #     and (source_entity.device_id is not None)
-        #     and (
-        #         (
-        #             device := device_registry.async_get(
-        #                 device_id=source_entity.device_id,
-        #             )
-        #         )
-        #         is not None
-        #     )
-        # ):
-        #     tmp_config = self.hass.config_entries.async_get_entry(
-        #         source_entity.config_entry_id
-        #     )
-
-        # state = self.hass.states.get(self.entry.options.get(CONF_ENTITY_ID, ""))
-
-        # if state is not None:
-        #     icon = state.attributes.get(ATTR_ICON)
-
         if self.entry.options.get(CONF_ICON, "").strip() != "":
             return self.entry.options.get(CONF_ICON, "mdi:state-machine")
 
-        return None
+        return self.entity_icon
 
     # ------------------------------------------------------
     @property
@@ -279,3 +318,45 @@ class StateUpdatedBinarySensor(BinarySensorEntity):
     async def async_update(self) -> None:
         """Update the entity. Only used by the generic entity update service."""
         await self.coordinator.async_request_refresh()
+
+    # ------------------------------------------------------
+    async def async_get_icon(self, entity_id: str) -> str:
+        """Get icon."""
+
+        state: State | None = self.hass.states.get(entity_id)
+        tmp_icon = state.attributes.get(ATTR_ICON, None)
+
+        if tmp_icon is not None:
+            return tmp_icon
+
+        entity_registry = er.async_get(self.hass)
+        source_entity = entity_registry.async_get(entity_id)
+
+        if source_entity is not None:
+            if source_entity.icon is not None:
+                return source_entity.icon
+
+            icons = await ic.async_get_icons(
+                self.hass,
+                "entity",
+                integrations=[source_entity.platform],
+                # "entity_component",
+                # integrations=["sensor"],
+            )
+
+            if (
+                icons is not None
+                and source_entity.platform in icons
+                and source_entity.domain in icons[source_entity.platform]
+                and source_entity.translation_key
+                in icons[source_entity.platform][source_entity.domain]
+                and "default"
+                in icons[source_entity.platform][source_entity.domain][
+                    source_entity.translation_key
+                ]
+            ):
+                return icons[source_entity.platform][source_entity.domain][
+                    source_entity.translation_key
+                ]["default"]
+
+        return None

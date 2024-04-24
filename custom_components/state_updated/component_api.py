@@ -124,16 +124,19 @@ class ComponentApi:
         """Get uom."""
 
         if self.entry.options.get(CONF_ENTITY_ID, "") != "":
-            tmp_uom: str = get_unit_of_measurement(
-                self.hass,
-                self.entry.options.get(CONF_ENTITY_ID),
-            )
+            try:
+                tmp_uom: str = get_unit_of_measurement(
+                    self.hass,
+                    self.entry.options.get(CONF_ENTITY_ID),
+                )
 
-        if tmp_uom is not None:
-            if tmp_uom == "%":
-                return tmp_uom
+                if tmp_uom is not None:
+                    if tmp_uom == "%":
+                        return tmp_uom
 
-            return " " + tmp_uom
+                    return " " + tmp_uom
+            except Exception:
+                pass
 
         return ""
 

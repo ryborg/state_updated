@@ -16,3 +16,5 @@ CONF_TEXT_TEMPLATE = "text_template"
 CONF_DEFAULT_TEXT_TEMPLATE = "config.step.user_ekstra.data.default_text_template"
 
 TRANSLATION_KEY = DOMAIN
+
+TRANSLATION_KEY_MISSING_ENTITY = "missing_entity"

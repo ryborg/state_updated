@@ -113,7 +113,7 @@ async def _create_form(
                     vol.Optional(CONF_NAME): selector.TextSelector(),
                     vol.Required(
                         CONF_ENTITY_ID,
-                        default=user_input.get(CONF_ENTITY_ID, ""),
+                        default=user_input.get(CONF_ENTITY_ID),
                     ): selector.EntitySelector(
                         selector.EntitySelectorConfig(
                             domain=SENSOR_DOMAIN, multiple=False
@@ -171,7 +171,7 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
         """Handle the initial step."""
         errors: dict[str, str] = {}
 
-        user_input |= self.tmp_user_input  # type: ignore
+        user_input |= self.tmp_user_input
 
         if user_input is not None:
             try:
@@ -264,7 +264,7 @@ class OptionsFlowHandler(OptionsFlow):
         if user_input is not None:
             try:
                 if await _validate_input(self.hass, user_input, errors):
-                    tmp_input = self._options | user_input  # type: ignore
+                    tmp_input = self._options | user_input
 
                     if (
                         CONF_ATTRIBUTE in tmp_input
