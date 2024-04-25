@@ -25,7 +25,6 @@ from homeassistant.helpers import (
 
 # entity_registry as er,
 # icon,
-from homeassistant.helpers.entity import get_device_class
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import (
     EventStateChangedData,
@@ -201,14 +200,9 @@ class StateUpdatedBinarySensor(BinarySensorEntity):
         """Hass started."""
 
         if await self.async_verify_entity_exist():
-            self.device_class = get_device_class(
-                self.hass, self.entry.options.get(CONF_ENTITY_ID)
+            self.entity_icon = await self.async_get_icon(
+                self.entry.options.get(CONF_ENTITY_ID)
             )
-
-            if self.device_class is None:
-                self.entity_icon = await self.async_get_icon(
-                    self.entry.options.get(CONF_ENTITY_ID)
-                )
 
     # ------------------------------------------------------------------
     async def async_create_issue_entity(
