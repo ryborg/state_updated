@@ -16,10 +16,10 @@ For installation instructions until the State updated helper is part of HACS, [s
 
 Configuration is setup via UI in Home assistant. To add one, go to [Settings > Devices & Services > Helpers](https://my.home-assistant.io/redirect/helpers) and click the add button. Next choose the [State updated helper](https://my.home-assistant.io/redirect/config_flow_start?domain=state_updated) option.
 
-<img src="https://github.com/kgn3400/state_updated/blob/main/images/config.png" width="500" height="auto" alt="Config">
+<img src="images/config.png" width="500" height="auto" alt="Config">
 <br/>
 
-<img src="https://github.com/kgn3400/state_updated/blob/main/images/options.png" width="500" height="auto" alt="Options">
+<img src="images/options.png" width="500" height="auto" alt="Options">
 <br/>
 
 | Field name | Mandatory/Optional | Description |
