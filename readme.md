@@ -18,6 +18,7 @@ Configuration is setup via UI in Home assistant. To add one, go to [Settings > D
 
 <img src="images/config.png" width="500" height="auto" alt="Config">
 <br/>
+<br/>
 
 <img src="images/options.png" width="500" height="auto" alt="Options">
 <br/>
