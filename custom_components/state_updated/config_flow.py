@@ -56,7 +56,7 @@ async def _create_form(
         user_input = {}
 
     match step:
-        case "user_ekstra" | "init":
+        case "user_extra" | "init":
             # trans: Translate = Translate(hass)
             # default_text_template: str = await trans.async_get_localized_str(
             #     CONF_DEFAULT_TEXT_TEMPLATE
@@ -144,9 +144,9 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
                     self.tmp_user_input = user_input
 
                     return self.async_show_form(
-                        step_id="user_ekstra",
+                        step_id="user_extra",
                         data_schema=await _create_form(
-                            self.hass, user_input, "user_ekstra"
+                            self.hass, user_input, "user_extra"
                         ),
                         errors=errors,
                     )
@@ -165,7 +165,7 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
         )
 
     # ------------------------------------------------------------------
-    async def async_step_user_ekstra(
+    async def async_step_user_extra(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Handle the initial step."""
@@ -209,8 +209,8 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
         #     user_input = {}
 
         return self.async_show_form(
-            step_id="user_ekstra",
-            data_schema=await _create_form(self.hass, user_input, "user_ekstra"),
+            step_id="user_extra",
+            data_schema=await _create_form(self.hass, user_input, "user_extra"),
             errors=errors,
             last_step=True,
         )

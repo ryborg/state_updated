@@ -5,6 +5,9 @@ import os
 import os.path
 from typing import Any
 
+import aiofiles
+
+from homeassistant.components.frontend import storage as frontend_store
 from homeassistant.core import HomeAssistant
 
 
@@ -37,9 +40,6 @@ class Translate:
             owner = await self.hass.auth.async_get_owner()
 
             if owner is not None:
-                # pylint: disable-next=import-outside-toplevel
-                from homeassistant.components.frontend import storage as frontend_store
-
                 _, owner_data = await frontend_store.async_user_store(
                     self.hass, owner.id
                 )
@@ -47,7 +47,7 @@ class Translate:
                 if "language" in owner_data and "language" in owner_data["language"]:
                     language = owner_data["language"]["language"]
 
-        self.__check_language_loaded(str(language), load_only)
+        await self.__async_check_language_loaded(str(language), load_only)
 
         if len(kvargs) == 0:
             return Translate.__json_dict.get(key, default)
@@ -55,7 +55,9 @@ class Translate:
         return str(Translate.__json_dict.get(key, default)).format(**kvargs)
 
     # ------------------------------------------------------------------
-    def __check_language_loaded(self, language: str, load_only: str = "") -> None:
+    async def __async_check_language_loaded(
+        self, language: str, load_only: str = ""
+    ) -> None:
         """Check language."""
 
         # ------------------------------------------------------------------
@@ -83,32 +85,19 @@ class Translate:
             )
 
             if os.path.isfile(filename):
-                with open(filename) as json_file:
-                    parsed_json = json.load(json_file)
+                async with aiofiles.open(filename) as json_file:
+                    parsed_json = json.loads(await json_file.read())
 
                 Translate.__json_dict = recursive_flatten("", parsed_json, load_only)
                 return
-
-            # filename = os.path.join(
-            #     os.path.dirname(__file__),
-            #     "translations",
-            #     self.hass.config.language + ".json",
-            # )
-
-            # if os.path.isfile(filename):
-            #     with open(filename) as json_file:
-            #         parsed_json = json.load(json_file)
-
-            #     Translate.__json_dict = recursive_flatten("", parsed_json, only)
-            #     return
 
             filename = os.path.join(
                 os.path.dirname(__file__), "translations", "en.json"
             )
 
             if os.path.isfile(filename):
-                with open(filename) as json_file:
-                    parsed_json = json.load(json_file)
+                async with aiofiles.open(filename) as json_file:
+                    parsed_json = json.loads(await json_file.read())
 
                 Translate.__json_dict = recursive_flatten("", parsed_json, load_only)
 

@@ -11,8 +11,10 @@
   "integration_type": "helper",
   "iot_class": "calculated",
   "issue_tracker": "https://github.com/kgn3400/state_updated/issues",
-  "requirements": [],
+  "requirements": [
+    "aiofiles"
+  ],
   "ssdp": [],
-  "version": "1.0.7",
+  "version": "1.0.8",
   "zeroconf": []
 }
