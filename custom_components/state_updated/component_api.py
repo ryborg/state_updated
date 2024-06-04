@@ -12,6 +12,8 @@ from homeassistant.const import (
     STATE_UNKNOWN,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError, TemplateError
+from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.entity import get_unit_of_measurement
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
@@ -22,6 +24,9 @@ from .const import (
     CONF_OLD_VALUE,
     CONF_TEXT_TEMPLATE,
     CONF_UPDATED,
+    DOMAIN,
+    DOMAIN_NAME,
+    TRANSLATION_KEY_MISSING_ENTITY,
 )
 
 
@@ -47,6 +52,7 @@ class ComponentApi:
         )
 
         self.uom: str = self.get_uom()
+        self.text: str = ""
 
         self.new_value: Any = entry.options.get(CONF_NEW_VALUE, "")
         self.old_value: Any = entry.options.get(CONF_OLD_VALUE, "")
@@ -135,7 +141,7 @@ class ComponentApi:
                         return tmp_uom
 
                     return " " + tmp_uom
-            except Exception:
+            except HomeAssistantError:
                 pass
 
         return ""
@@ -144,7 +150,7 @@ class ComponentApi:
     def create_text_from_template(self) -> None:
         """Create text from template."""
 
-        if self.updated and self.entry.options.get(CONF_TEXT_TEMPLATE, "") != "":
+        if self.updated and self.entry.options.get(CONF_TEXT_TEMPLATE, ""):
             values: dict[str, Any] = {
                 CONF_ENTITY_ID: self.entry.options.get(CONF_ENTITY_ID, ""),
                 CONF_ATTRIBUTE: self.entry.options.get(CONF_ATTRIBUTE, ""),
@@ -153,13 +159,47 @@ class ComponentApi:
                 CONF_LAST_UPDATED: self.last_updated.isoformat(),
             }
 
-            value_template: Template | None = Template(
-                str(self.entry.options.get(CONF_TEXT_TEMPLATE)), self.hass
-            )
+            try:
+                value_template: Template | None = Template(
+                    str(self.entry.options.get(CONF_TEXT_TEMPLATE)), self.hass
+                )
 
-            self.text = value_template.async_render_with_possible_json_value(
-                self.new_value, variables=values
-            )
+                self.text = value_template.async_render(values)
+            except (TypeError, TemplateError) as e:
+                self.create_issue_template(
+                    str(e),
+                    value_template.template,
+                    TRANSLATION_KEY_MISSING_ENTITY,
+                )
 
         else:
             self.text = ""
+
+    # ------------------------------------------------------------------
+    def create_issue_template(
+        self,
+        error_txt: str,
+        template: str,
+        translation_key: str,
+    ) -> None:
+        """Create issue on entity."""
+
+        if (
+            self.last_error_template != template
+            or error_txt != self.last_error_txt_template
+        ):
+            ir.async_create_issue(
+                self.hass,
+                DOMAIN,
+                DOMAIN_NAME + datetime.now().isoformat(),
+                issue_domain=DOMAIN,
+                is_fixable=False,
+                severity=ir.IssueSeverity.WARNING,
+                translation_key=translation_key,
+                translation_placeholders={
+                    "error_txt": error_txt,
+                    "template": template,
+                },
+            )
+            self.last_error_template = template
+            self.last_error_txt_template = error_txt

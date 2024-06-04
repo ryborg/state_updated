@@ -58,6 +58,10 @@
     "missing_entity": {
       "description": "Det ser ud til at enten er entitet `{entity}` blevet slettet eller omdøbt, som bruges af Tilstand opdateret hjælper `{state_updated_helper}`. \n\n Venligst ret problemet.",
       "title": "Tilstand opdateret hjælper: Entitet slettet eller omdøbt"
+    },
+    "template_error": {
+      "description": "Behandling af skabelon `{template}` fejler.\nFejl: `{error_txt}` \n\n Venligst ret dette problem.",
+      "title": "Pypi opdateringer: Skabelon fejl"
     }
   },
   "services": {
