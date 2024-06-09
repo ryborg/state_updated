@@ -6,7 +6,7 @@
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/kgn3400/state_updated)
 [![Validate% with hassfest](https://github.com/kgn3400/state_updated/workflows/Validate%20with%20hassfest/badge.svg)](https://github.com/kgn3400/state_updated/actions/workflows/hassfest.yaml)
 
-The state updated helper integration allows you to create binary sensors which monitor another entity's __state__ or __state_attributes__. It exposes the new and old value for the monitored entity and are cleared after the user defined time period has expired.
+The state updated helper integration allows you to create a binary sensors which monitor another entity's __state__ or __state_attributes__ and reports when changed. It exposes the new and old value for the monitored entity, which can be used in the text template. The binary sensor will be cleared after the user defined time period has expired.
 
 For installation instructions until the State updated helper is part of HACS, [see this guide](https://hacs.xyz/docs/faq/custom_repositories).
 
