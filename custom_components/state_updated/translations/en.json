@@ -54,6 +54,26 @@
       }
     }
   },
+  "entity": {
+    "binary_sensor": {
+      "state_updated": {
+        "state_attributes": {
+          "new_value": {
+            "name": "New value"
+          },
+          "old_value": {
+            "name": "Old value"
+          },
+          "last_updated": {
+            "name": "Last updated"
+          },
+          "text": {
+            "name": "Text"
+          }
+        }
+      }
+    }
+  },
   "issues": {
     "missing_entity": {
       "description": "It looks like either entity `{entity}` has been deleted or removed, which are used in State updated helper `{state_updated_helper}`. \n\n Please fix this problem.",

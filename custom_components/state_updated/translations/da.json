@@ -54,6 +54,26 @@
       }
     }
   },
+  "entity": {
+    "binary_sensor": {
+      "state_updated": {
+        "state_attributes": {
+          "new_value": {
+            "name": "Ny værdi"
+          },
+          "old_value": {
+            "name": "Gammel værdi"
+          },
+          "last_updated": {
+            "name": "Sidste opdatering"
+          },
+          "text": {
+            "name": "Tekst"
+          }
+        }
+      }
+    }
+  },
   "issues": {
     "missing_entity": {
       "description": "Det ser ud til at enten er entitet `{entity}` blevet slettet eller omdøbt, som bruges af Tilstand opdateret hjælper `{state_updated_helper}`. \n\n Venligst ret problemet.",
