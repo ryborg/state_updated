@@ -27,6 +27,7 @@
         "data": {
           "attribute": "Attribute of entity that this sensor tracks",
           "icon": "Icon",
+          "device_id": "Select a device to link this entity",
           "clear_update_after_hours": "Clear updated after",
           "text_template": "Defines a template to create the text attribute. Values = new_value, old_value, entity_id, attribute and last_updated",
           "default_text_template": "Entity {{ entity_id }} state changed from {{ old_value }} from {{ new_value }}."
@@ -47,6 +48,7 @@
         "data": {
           "attribute": "Attribute of entity that this sensor tracks",
           "icon": "Icon",
+          "device_id": "Select a device to link this entity",
           "clear_update_after_hours": "Clear updates after",
           "text_template": "Defines a template to create the text attribute. Values = new_value, old_value, entity_id, attribute and last_updated",
           "default_text_template": "Entity {{ entity_id }} state changed from {{ old_value }} from {{ new_value }}."

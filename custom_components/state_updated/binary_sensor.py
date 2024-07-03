@@ -9,6 +9,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     ATTR_ICON,
     CONF_ATTRIBUTE,
+    CONF_DEVICE_ID,
     CONF_ENTITY_ID,
     CONF_ICON,
     STATE_UNAVAILABLE,
@@ -25,6 +26,7 @@ from homeassistant.helpers import (
 
 # entity_registry as er,
 # icon,
+from homeassistant.helpers.device import async_device_info_to_link_from_device_id
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import (
     EventStateChangedData,
@@ -98,6 +100,11 @@ class StateUpdatedBinarySensor(BinarySensorEntity):
         )
 
         self.entity_icon: str = None
+
+        self._attr_device_info = async_device_info_to_link_from_device_id(
+            hass,
+            entry.options.get(CONF_DEVICE_ID),
+        )
 
     # ------------------------------------------------------
     async def async_reset_entity(

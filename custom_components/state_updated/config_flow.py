@@ -2,19 +2,29 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, cast
 
 import voluptuous as vol
 
+from custom_components.state_updated.translate import Translate
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-
-#  from homeassistant import config_entries
-from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
-from homeassistant.const import CONF_ATTRIBUTE, CONF_ENTITY_ID, CONF_ICON, CONF_NAME
-from homeassistant.core import HomeAssistant, State, callback
-from homeassistant.data_entry_flow import FlowResult
+from homeassistant.const import (
+    CONF_ATTRIBUTE,
+    CONF_DEVICE_ID,
+    CONF_ENTITY_ID,
+    CONF_ICON,
+    CONF_NAME,
+)
+from homeassistant.core import State, callback
 from homeassistant.helpers import selector
+from homeassistant.helpers.schema_config_entry_flow import (
+    SchemaCommonFlowHandler,
+    SchemaConfigFlowHandler,
+    SchemaFlowFormStep,
+    SchemaFlowMenuStep,
+)
 from homeassistant.helpers.selector import (
     IconSelector,
     NumberSelector,
@@ -32,191 +42,114 @@ from .const import (
     CONF_TEXT_TEMPLATE,
     CONF_UPDATED,
     DOMAIN,
-    LOGGER,
 )
-from .translate import Translate
 
 
 # ------------------------------------------------------------------
-async def _validate_input(
-    hass: HomeAssistant, user_input: dict[str, Any], errors: dict[str, str]
-) -> bool:
-    """Validate the user input allows us to connect."""
+async def user_schema(handler: SchemaCommonFlowHandler) -> vol.Schema:
+    """Return schema for the user step."""
 
-    return True
+    return vol.Schema(
+        {
+            vol.Optional(
+                CONF_NAME,
+            ): selector.TextSelector(),
+            vol.Required(
+                CONF_ENTITY_ID,
+            ): selector.EntitySelector(
+                selector.EntitySelectorConfig(domain=SENSOR_DOMAIN, multiple=False),
+            ),
+        }
+    )
 
 
 # ------------------------------------------------------------------
-async def _create_form(
-    hass: HomeAssistant, user_input: dict[str, Any] | None = None, step: str = ""
-) -> vol.Schema:
-    """Create a form for step/option."""
+async def init_schema(handler: SchemaCommonFlowHandler) -> vol.Schema:
+    """Return schema for the init step."""
+    options = handler.options.copy()
 
-    if user_input is None:
-        user_input = {}
-
-    match step:
-        case "user_extra" | "init":
-            # trans: Translate = Translate(hass)
-            # default_text_template: str = await trans.async_get_localized_str(
-            #     CONF_DEFAULT_TEXT_TEMPLATE
-            # )
-
-            return vol.Schema(
-                {
-                    vol.Optional(
-                        CONF_ATTRIBUTE,
-                        default=user_input.get(CONF_ATTRIBUTE, ""),
-                    ): selector.AttributeSelector(
-                        selector.AttributeSelectorConfig(
-                            entity_id=user_input[CONF_ENTITY_ID]
-                        )
+    return vol.Schema(
+        {
+            vol.Optional(
+                CONF_ATTRIBUTE,
+            ): selector.AttributeSelector(
+                selector.AttributeSelectorConfig(entity_id=options[CONF_ENTITY_ID])
+            ),
+            vol.Optional(
+                CONF_ICON,
+            ): IconSelector(),
+            vol.Optional(
+                CONF_DEVICE_ID,
+            ): selector.DeviceSelector(),
+            vol.Required(CONF_CLEAR_UPDATES_AFTER_HOURS, default=25): NumberSelector(
+                NumberSelectorConfig(
+                    min=0.1,
+                    max=999,
+                    step="any",
+                    mode=NumberSelectorMode.BOX,
+                    unit_of_measurement="hours",
+                )
+            ),
+            vol.Optional(
+                CONF_TEXT_TEMPLATE,
+                default=options.get(
+                    CONF_TEXT_TEMPLATE,
+                    await Translate(
+                        handler.parent_handler.hass
+                    ).async_get_localized_str(
+                        CONF_DEFAULT_TEXT_TEMPLATE,
+                        load_only=CONF_DEFAULT_TEXT_TEMPLATE,
                     ),
-                    vol.Optional(
-                        CONF_ICON,
-                        default=user_input.get(CONF_ICON, ""),
-                    ): IconSelector(),
-                    vol.Required(
-                        CONF_CLEAR_UPDATES_AFTER_HOURS,
-                        default=user_input.get(CONF_CLEAR_UPDATES_AFTER_HOURS, 24),
-                    ): NumberSelector(
-                        NumberSelectorConfig(
-                            min=0.1,
-                            max=999,
-                            step="any",
-                            mode=NumberSelectorMode.BOX,
-                            unit_of_measurement="hours",
-                        )
-                    ),
-                    vol.Optional(
-                        CONF_TEXT_TEMPLATE,
-                        default=user_input.get(
-                            CONF_TEXT_TEMPLATE,
-                            await Translate(hass).async_get_localized_str(
-                                CONF_DEFAULT_TEXT_TEMPLATE,
-                                load_only=CONF_DEFAULT_TEXT_TEMPLATE,
-                            ),
-                        ),
-                    ): TemplateSelector(),
-                    # vol.Optional(
-                    #     CONF_TEXT_TEMPLATE,
-                    #     default=user_input.get(
-                    #         CONF_TEXT_TEMPLATE, default_text_template
-                    #     ),
-                    # ): TemplateSelector(),
-                }
-            )
-
-        case "user" | _:
-            return vol.Schema(
-                {
-                    vol.Optional(CONF_NAME): selector.TextSelector(),
-                    vol.Required(
-                        CONF_ENTITY_ID,
-                        default=user_input.get(CONF_ENTITY_ID),
-                    ): selector.EntitySelector(
-                        selector.EntitySelectorConfig(
-                            domain=SENSOR_DOMAIN, multiple=False
-                        ),
-                    ),
-                }
-            )
+                ),
+            ): TemplateSelector(),
+        },
+    )
 
 
-# ------------------------------------------------------------------
-# ------------------------------------------------------------------
-class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
-    """Handle a config flow."""
+CONFIG_FLOW: dict[str, SchemaFlowFormStep | SchemaFlowMenuStep] = {
+    "user": SchemaFlowFormStep(user_schema, next_step="user_extra"),
+    "user_extra": SchemaFlowFormStep(init_schema),
+}
+OPTIONS_FLOW: dict[str, SchemaFlowFormStep | SchemaFlowMenuStep] = {
+    "init": SchemaFlowFormStep(init_schema)
+}
 
-    VERSION = 1
-    tmp_user_input: dict[str, Any] | None
+
+class ConfigFlowHandler(SchemaConfigFlowHandler, domain=DOMAIN):
+    """Handle a config or options flow."""
+
+    config_flow = CONFIG_FLOW
+    options_flow = OPTIONS_FLOW
+
+    def async_config_entry_title(self, options: Mapping[str, Any]) -> str:
+        """Return config entry title."""
+
+        if CONF_NAME in options:
+            title: str = options[CONF_NAME]
+        else:
+            title = options[CONF_ENTITY_ID]
+            title = title[title.find(".") + 1 :] + " updated"
+            title = title.replace("_", " ")
+
+        return cast(str, title)
 
     # ------------------------------------------------------------------
-    async def async_step_user(
-        self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
-        """Handle the initial step."""
-        errors: dict[str, str] = {}
+    @callback
+    def async_config_flow_finished(self, options: Mapping[str, Any]) -> None:
+        """Take necessary actions after the config flow is finished, if needed.
 
-        if user_input is not None:
-            try:
-                if await _validate_input(self.hass, user_input, errors):
-                    self.tmp_user_input = user_input
-
-                    return self.async_show_form(
-                        step_id="user_extra",
-                        data_schema=await _create_form(
-                            self.hass, user_input, "user_extra"
-                        ),
-                        errors=errors,
-                    )
-
-            except Exception:  # pylint: disable=broad-except
-                LOGGER.exception("Unexpected exception")
-                errors["base"] = "unknown"
-        # else:
-        #     user_input = {}
-
-        return self.async_show_form(
-            step_id="user",
-            data_schema=await _create_form(self.hass, user_input, "user"),
-            errors=errors,
-            last_step=False,
+        The options parameter contains config entry options, which is the union of user
+        input from the config flow steps.
+        """
+        options[CONF_NEW_VALUE] = options[CONF_OLD_VALUE] = self.get_current_state(
+            options
         )
 
-    # ------------------------------------------------------------------
-    async def async_step_user_extra(
-        self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
-        """Handle the initial step."""
-        errors: dict[str, str] = {}
-
-        user_input |= self.tmp_user_input
-
-        if user_input is not None:
-            try:
-                if await _validate_input(self.hass, user_input, errors):
-                    if CONF_NAME in user_input:
-                        title: str = user_input[CONF_NAME]
-                    else:
-                        title = user_input[CONF_ENTITY_ID]
-                        title = title[title.find(".") + 1 :] + " updated"
-                        title = title.replace("_", " ")
-
-                    if (
-                        CONF_ATTRIBUTE in user_input
-                        and str(user_input.get(CONF_ATTRIBUTE, "")).strip() == ""
-                    ):
-                        del user_input[CONF_ATTRIBUTE]
-
-                    user_input[CONF_NEW_VALUE] = user_input[
-                        CONF_OLD_VALUE
-                    ] = await self.await_get_current_state(user_input)
-
-                    user_input[CONF_UPDATED] = False
-                    user_input[CONF_LAST_UPDATED] = datetime.now(UTC).isoformat()
-
-                    return self.async_create_entry(
-                        title=title,
-                        data=user_input,
-                        options=user_input,
-                    )
-
-            except Exception:  # pylint: disable=broad-except
-                LOGGER.exception("Unexpected exception")
-                errors["base"] = "unknown"
-        # else:
-        #     user_input = {}
-
-        return self.async_show_form(
-            step_id="user_extra",
-            data_schema=await _create_form(self.hass, user_input, "user_extra"),
-            errors=errors,
-            last_step=True,
-        )
+        options[CONF_UPDATED] = False
+        options[CONF_LAST_UPDATED] = datetime.now(UTC).isoformat()
 
     # ------------------------------------------------------------------
-    async def await_get_current_state(self, user_input: dict[str, Any]) -> Any:
+    def get_current_state(self, user_input: dict[str, Any]) -> Any:
         """Get current state."""
         tmp_state: Any = ""
         state: State | None = self.hass.states.get(user_input[CONF_ENTITY_ID])
@@ -228,62 +161,3 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
                 tmp_state = state.state
 
         return tmp_state
-
-    # ------------------------------------------------------------------
-    @staticmethod
-    @callback
-    def async_get_options_flow(
-        config_entry: ConfigEntry,
-    ) -> OptionsFlow:
-        """Get the options flow."""
-        return OptionsFlowHandler(config_entry)
-
-
-# ------------------------------------------------------------------
-# ------------------------------------------------------------------
-class OptionsFlowHandler(OptionsFlow):
-    """Options flow for State updated."""
-
-    def __init__(
-        self,
-        config_entry: ConfigEntry,
-    ) -> None:
-        """Initialize options flow."""
-
-        self.config_entry = config_entry
-
-        self._options: dict[str, Any] = self.config_entry.options.copy()
-
-    # ------------------------------------------------------------------
-    async def async_step_init(
-        self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
-        """Handle the initial step."""
-        errors: dict[str, str] = {}
-
-        if user_input is not None:
-            try:
-                if await _validate_input(self.hass, user_input, errors):
-                    tmp_input = self._options | user_input
-
-                    if (
-                        CONF_ATTRIBUTE in tmp_input
-                        and str(tmp_input.get(CONF_ATTRIBUTE, "")).strip() == ""
-                    ):
-                        del tmp_input[CONF_ATTRIBUTE]
-
-                    return self.async_create_entry(
-                        data=tmp_input,
-                    )
-            except Exception:  # pylint: disable=broad-except
-                LOGGER.exception("Unexpected exception")
-                errors["base"] = "unknown"
-        else:
-            user_input = self._options.copy()
-
-        return self.async_show_form(
-            step_id="init",
-            data_schema=await _create_form(self.hass, user_input, "init"),
-            errors=errors,
-            last_step=True,
-        )
