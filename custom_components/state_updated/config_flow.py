@@ -18,7 +18,7 @@ from homeassistant.const import (
     CONF_NAME,
 )
 from homeassistant.core import State, callback
-from homeassistant.helpers import selector
+from homeassistant.helpers import entity_registry as er, selector
 from homeassistant.helpers.schema_config_entry_flow import (
     SchemaCommonFlowHandler,
     SchemaConfigFlowHandler,
@@ -68,6 +68,12 @@ async def init_schema(handler: SchemaCommonFlowHandler) -> vol.Schema:
     """Return schema for the init step."""
     options = handler.options.copy()
 
+    dev_id: str = ""
+
+    if handler.parent_handler.init_step == "user":
+        entity_registry = er.async_get(handler.parent_handler.hass)
+        dev_id = entity_registry.async_get(options[CONF_ENTITY_ID]).device_id
+
     return vol.Schema(
         {
             vol.Optional(
@@ -78,9 +84,7 @@ async def init_schema(handler: SchemaCommonFlowHandler) -> vol.Schema:
             vol.Optional(
                 CONF_ICON,
             ): IconSelector(),
-            vol.Optional(
-                CONF_DEVICE_ID,
-            ): selector.DeviceSelector(),
+            vol.Optional(CONF_DEVICE_ID, default=dev_id): selector.DeviceSelector(),
             vol.Required(CONF_CLEAR_UPDATES_AFTER_HOURS, default=25): NumberSelector(
                 NumberSelectorConfig(
                     min=0.1,

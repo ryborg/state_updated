@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_DEVICE_ID, Platform, __short_version__
+from homeassistant.const import CONF_DEVICE_ID, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device import (
     async_remove_stale_devices_links_keep_current_device,
@@ -21,12 +21,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     entry.async_on_unload(entry.add_update_listener(update_listener))
 
-    if __short_version__ >= "2024.7":
-        async_remove_stale_devices_links_keep_current_device(
-            hass,
-            entry.entry_id,
-            entry.options.get(CONF_DEVICE_ID),
-        )
+    async_remove_stale_devices_links_keep_current_device(
+        hass,
+        entry.entry_id,
+        entry.options.get(CONF_DEVICE_ID),
+    )
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
