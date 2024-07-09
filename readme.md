@@ -9,6 +9,8 @@
 The state updated helper integration allows you to create a binary sensors which monitor another entity's __state__ or __state_attributes__ and reports when changed. It exposes the new and old value for the monitored entity, which can be used in the text template. The binary sensor will be cleared after the user defined time period has expired.
 
 For installation instructions until the State updated helper is part of HACS, [see this guide](https://hacs.xyz/docs/faq/custom_repositories).
+Or click
+[![My Home Assistant](https://img.shields.io/badge/Home%20Assistant-%2341BDF5.svg?style=flat&logo=home-assistant&label=Add%20to%20HACS)](https://my.home-assistant.io/redirect/hacs_repository/?owner=kgn3400&repository=state_updated&category=integration)
 
 [![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=state_updated)
 
