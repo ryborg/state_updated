@@ -22,7 +22,7 @@
           "entity_id": "Entitet som sensoren sporer"
         }
       },
-      "user_ekstra": {
+      "user_extra": {
         "title": "Tilstand opdateret hjælper",
         "data": {
           "attribute": "Entitets attribut for entitet som spores",

@@ -119,6 +119,8 @@ OPTIONS_FLOW: dict[str, SchemaFlowFormStep | SchemaFlowMenuStep] = {
 }
 
 
+# ------------------------------------------------------------------
+# ------------------------------------------------------------------
 class ConfigFlowHandler(SchemaConfigFlowHandler, domain=DOMAIN):
     """Handle a config or options flow."""
 
