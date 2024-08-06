@@ -48,11 +48,11 @@ The state updated helper integration provides the following state attributes.
 | text  | Text generated from template |
 | last_updated  | Last time the state/state_attribute was updated |
 
-## Services
+## Actions
 
 Available services: __reset__ and __reset_all__.
 
-### Service state_updated.reset
+### Actions state_updated.reset
 
 Reset a specific State Updated entity.
 
@@ -60,7 +60,7 @@ Reset a specific State Updated entity.
 |-----------------------|----------|------------|
 |entity_id | No | Name of the State updated entity to take reset.|
 
-### Service state_updated.reset_all
+### Action state_updated.reset_all
 
 Reset all State updated entities.
 
