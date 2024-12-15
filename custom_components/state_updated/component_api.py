@@ -3,7 +3,6 @@
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
-from custom_components.pypi_updates.const import CONF_CLEAR_UPDATES_AFTER_HOURS
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_ATTRIBUTE,
@@ -19,6 +18,7 @@ from homeassistant.helpers.template import Template
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import (
+    CONF_CLEAR_UPDATES_AFTER_HOURS,
     CONF_LAST_UPDATED,
     CONF_NEW_VALUE,
     CONF_OLD_VALUE,
