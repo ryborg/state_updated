@@ -9,7 +9,8 @@ from typing import Any, cast
 import voluptuous as vol
 
 from custom_components.state_updated.translate import Translate
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
+
+# from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.const import (
     CONF_ATTRIBUTE,
     CONF_DEVICE_ID,
@@ -57,7 +58,8 @@ async def user_schema(handler: SchemaCommonFlowHandler) -> vol.Schema:
             vol.Required(
                 CONF_ENTITY_ID,
             ): selector.EntitySelector(
-                selector.EntitySelectorConfig(domain=SENSOR_DOMAIN, multiple=False),
+                selector.EntitySelectorConfig(multiple=False),
+                # selector.EntitySelectorConfig(domain=SENSOR_DOMAIN, multiple=False),
             ),
         }
     )
@@ -71,8 +73,14 @@ async def init_schema(handler: SchemaCommonFlowHandler) -> vol.Schema:
     dev_id: str = ""
 
     if handler.parent_handler.init_step == "user":
-        entity_registry = er.async_get(handler.parent_handler.hass)
-        dev_id = entity_registry.async_get(options[CONF_ENTITY_ID]).device_id
+        try:
+            entity_registry = er.async_get(handler.parent_handler.hass)
+            dev_id = entity_registry.async_get(options[CONF_ENTITY_ID]).device_id
+        except AttributeError:
+            dev_id = ""
+
+        if dev_id is None:
+            dev_id = ""
 
     return vol.Schema(
         {
