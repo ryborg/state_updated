@@ -1,11 +1,15 @@
-# State updated helper
-
+<!-- markdownlint-disable MD041 -->
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/kgn3400/state_updated)
 ![GitHub all releases](https://img.shields.io/github/downloads/kgn3400/state_updated/total)
 ![GitHub last commit](https://img.shields.io/github/last-commit/kgn3400/state_updated)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/kgn3400/state_updated)
 [![Validate% with hassfest](https://github.com/kgn3400/state_updated/workflows/Validate%20with%20hassfest/badge.svg)](https://github.com/kgn3400/state_updated/actions/workflows/hassfest.yaml)
 
+<img align="left" width="80" height="80" src="https://kgn3400.github.io/state_updated/assets/icon.png" alt="App icon">
+
+# State updated helper
+
+<br/>
 The state updated helper integration allows you to create a binary sensor which monitor another entity's __state__ or __state_attributes__ and reports when changed. It exposes the new and old value for the monitored entity, which can be used in the text template. The binary sensor will be cleared after a user defined time period has expired.
 
 ## installation
