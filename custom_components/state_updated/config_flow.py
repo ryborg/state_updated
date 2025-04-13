@@ -8,8 +8,6 @@ from typing import Any, cast
 
 import voluptuous as vol
 
-from custom_components.state_updated.translate import Translate
-
 # from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.const import (
     CONF_ATTRIBUTE,
@@ -44,6 +42,7 @@ from .const import (
     CONF_UPDATED,
     DOMAIN,
 )
+from .hass_util import Translate
 
 
 # ------------------------------------------------------------------
