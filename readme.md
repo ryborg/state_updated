@@ -77,3 +77,7 @@ Reset all State updated entities.
 ## Usage scenario
 
 Using the Scrape integration for retrieving latest software version. By letting the State updated helper monitor the Scrape entity, a card can be built that only shows when there are changes and an the content about what has changed.
+
+### Support
+
+If you like this integration or find it useful, please consider giving it a ⭐️ on GitHub 👍 Your support is greatly appreciated!
