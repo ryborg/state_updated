@@ -10,11 +10,12 @@
 # State updated helper
 
 <br/>
-The state updated helper integration allows you to create a binary sensor which monitor another entity's __state__ or __state_attributes__ and reports when changed. It exposes the new and old value for the monitored entity, which can be used in the text template. The binary sensor will be cleared after a user defined time period has expired.
+The State Updated Helper integration lets you create a binary sensor that monitors changes in another entity’s state or state_attributes. Whenever the monitored entity changes, the binary sensor is triggered and provides both the new and old values, which you can use in text templates for notifications or automations.
+This makes it easy to track exactly what changed and when. After a user-defined time period, the binary sensor automatically resets, ready to detect the next change. This integration is ideal for monitoring important state changes and responding to them quickly and efficiently in your Home Assistant setup.
 
 ## installation
 
-For installation from HACS repository, click
+For installation search for State updated helper in HACS and download. Or click
 [![Open HACS Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=kgn3400&repository=state_updated&category=integration)
 
 State updated helper integration can be installed using HACS.
@@ -25,7 +26,7 @@ Add a new State updated helper integration to your Home Assistant instance, clic
 
 ## Configuration
 
-Configuration is setup via UI in Home assistant. To add one, go to [Settings > Devices & Services > Helpers](https://my.home-assistant.io/redirect/helpers) and click the add button. Next choose the [State updated helper](https://my.home-assistant.io/redirect/config_flow_start?domain=state_updated) option.
+Configuration is done through the Home Assistant UI. To add a new entry, simply go to [Settings > Devices & Services > Helpers](https://my.home-assistant.io/redirect/helpers) and click the add button. Next choose the [State updated helper](https://my.home-assistant.io/redirect/config_flow_start?domain=state_updated) option.
 
 <img src="https://kgn3400.github.io/state_updated/assets/config.png" width="500" height="auto" alt="Config">
 <!--<img src="images/config.png" width="500" height="auto" alt="Config">-->
