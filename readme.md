@@ -10,6 +10,7 @@
 # State updated helper
 
 <br/>
+
 The State Updated Helper integration lets you create a binary sensor that monitors changes in another entity’s state or state_attributes. Whenever the monitored entity changes, the binary sensor is triggered and provides both the new and old values, which you can use in text templates for notifications or automations.
 This makes it easy to track exactly what changed and when. After a user-defined time period, the binary sensor automatically resets, ready to detect the next change. This integration is ideal for monitoring important state changes and responding to them quickly and efficiently in your Home Assistant setup.
 
