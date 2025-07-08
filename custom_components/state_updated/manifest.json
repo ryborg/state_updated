@@ -12,10 +12,11 @@
   "iot_class": "calculated",
   "issue_tracker": "https://github.com/kgn3400/state_updated/issues",
   "requirements": [
+    "jsonpickle",
     "aiofiles",
     "orjson"
   ],
   "ssdp": [],
-  "version": "1.0.21",
+  "version": "1.0.22",
   "zeroconf": []
 }
