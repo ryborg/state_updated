@@ -58,7 +58,7 @@
         "data": {
           "attribute": "Attribute of entity that this sensor tracks",
           "icon": "Icon",
-          "clear_update_after_hours": "Clear updates after",
+          "clear_update_after_minutes": "Clear updates after",
           "text_template": "Defines a template to create the text attribute. Value = new_value, old_value, entity_id, attribute and last_updated",
           "default_text_template": "Entity {{ entity_id }} state changed from {{ old_value }} from {{ new_value }}."
         }
