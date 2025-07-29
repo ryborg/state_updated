@@ -33,7 +33,7 @@ from homeassistant.helpers.selector import (
 )
 
 from .const import (
-    CONF_CLEAR_UPDATES_AFTER_HOURS,
+    CONF_CLEAR_UPDATES_AFTER_MINUTES,
     CONF_DEFAULT_TEXT_TEMPLATE,
     CONF_LAST_UPDATED,
     CONF_NEW_VALUE,
@@ -92,13 +92,13 @@ async def init_schema(handler: SchemaCommonFlowHandler) -> vol.Schema:
                 CONF_ICON,
             ): IconSelector(),
             vol.Optional(CONF_DEVICE_ID, default=dev_id): selector.DeviceSelector(),
-            vol.Required(CONF_CLEAR_UPDATES_AFTER_HOURS, default=25): NumberSelector(
+            vol.Required(CONF_CLEAR_UPDATES_AFTER_MINUTES, default=10): NumberSelector(
                 NumberSelectorConfig(
-                    min=0.1,
-                    max=999,
+                    min=0.017,
+                    max=43200,
                     step="any",
                     mode=NumberSelectorMode.BOX,
-                    unit_of_measurement="hours",
+                    unit_of_measurement="minutes",
                 )
             ),
             vol.Optional(
