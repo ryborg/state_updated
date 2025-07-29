@@ -46,7 +46,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: CommonConfigEntry) -> bo
         hass,
         LOGGER,
         name=DOMAIN,
-        update_interval=timedelta(minutes=1),
+        update_interval=timedelta(seconds=30),
         update_method=component_api.async_update,
     )
 
