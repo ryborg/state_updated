@@ -6,7 +6,7 @@ DOMAIN = "state_updated"
 DOMAIN_NAME = "State updated"
 LOGGER: Logger = getLogger(__name__)
 
-CONF_CLEAR_UPDATES_AFTER_HOURS = "clear_update_after_hours"
+CONF_CLEAR_UPDATES_AFTER_MINUTES = "clear_update_after_minutes"
 CONF_NEW_VALUE = "new_value"
 CONF_OLD_VALUE = "old_value"
 CONF_LAST_UPDATED = "last_updated"
