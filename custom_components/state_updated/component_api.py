@@ -18,7 +18,7 @@ from homeassistant.helpers.template import Template
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import (
-    CONF_CLEAR_UPDATES_AFTER_HOURS,
+    CONF_CLEAR_UPDATES_AFTER_MINUTES,
     CONF_LAST_UPDATED,
     CONF_NEW_VALUE,
     CONF_OLD_VALUE,
@@ -115,7 +115,7 @@ class ComponentApi:
 
         if self.updated and (
             self.last_updated
-            + timedelta(hours=self.entry.options[CONF_CLEAR_UPDATES_AFTER_HOURS])
+            + timedelta(minutes=self.entry.options[CONF_CLEAR_UPDATES_AFTER_MINUTES])
         ) < datetime.now(UTC):
             self.updated = False
             self.text = ""
